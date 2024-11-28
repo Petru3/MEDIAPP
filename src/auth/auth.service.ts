@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException, Logger, HttpException, HttpStatus } from '@nestjs/common';
-import { AuthCredentials } from './dto/auth-credentials.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './user/user.repostitory';
 import { JwtService } from '@nestjs/jwt';
