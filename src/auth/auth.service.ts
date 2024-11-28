@@ -37,9 +37,15 @@ export class AuthService {
     return { accessToken };
   }
 
-  async getUsers(role?: UserRole): Promise<User[]> {
+  async getUsers(
+    role?: UserRole,
+    departmentId?: string
+  ): Promise<User[]> {
     if (role) {
       return this.userRepository.findByRole(role);
+    }
+    if(departmentId) {
+      return this.userRepository.findByDepartmentId(departmentId);
     }
     return this.userRepository.findAll();
   }

@@ -24,6 +24,12 @@ export class UserRepository extends Repository<User> {
     return await this.find({ where: { role } });
   }
 
+  async findByDepartmentId(
+    departmentId: string,
+  ):Promise<User[]> {
+    return await this.find({where: { DepartmentID: departmentId }})
+  }
+
   // Creating new User
   async signUp(signUpCredentials: SignUpCredentials): Promise<void> {
     const { DepartmentID, email, password, role } = signUpCredentials;

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInCredentials } from './dto/signin-credentials.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -48,7 +48,8 @@ export class AuthController {
   @UseGuards(AuthGuard())
   async getUsers(
     @GetUser() user: User,
-    @Query('role') role?: UserRole
+    @Query('role') role?: UserRole,
+    @Query('departmentId') departmentId?: string,
   ): Promise<User[]> {
 
     this.checkUserPrivileges(user);
@@ -56,7 +57,7 @@ export class AuthController {
     if (role && !Object.values(UserRole).includes(role)) {
       throw new NotFoundException('Invalid role provided');
     }
-    return this.authService.getUsers(role);
+    return this.authService.getUsers(role, departmentId);
   }
 
   @Get(':id')
@@ -77,25 +78,25 @@ export class AuthController {
     @Body(ValidationPipe) updateCredentials: UpdateCredentials,
     @GetUser() user: User
   ): Promise<User> {
-
     if (user.role !== UserRole.ADMIN && user.role !== UserRole.COORDONATOR) {
       if (user.id !== id) {
-        throw new NotFoundException(`You can't update others profiles!`);
+        throw new NotFoundException(`You can't update others' profiles!`);
       }
 
       const allowedFields = ['FullName', 'PhoneNumber', 'Adress'];
-      const keys = Object.keys(updateCredentials);
-
-      for (const key of keys) {
-        if (!allowedFields.includes(key)) {
-          throw new NotFoundException('You can only update FullName, PhoneNumber, and Address');
-        }
+      const invalidFields = Object.keys(updateCredentials).filter(
+        (key) => !allowedFields.includes(key)
+      );
+      if (invalidFields.length > 0) {
+        throw new BadRequestException(
+          `Invalid fields: ${invalidFields.join(', ')}. You can only update ${allowedFields.join(', ')}.`
+        );
       }
     }
 
     return this.authService.updateUserById(id, updateCredentials, user);
   }
-
+  
   @Delete(':id')
   @UseGuards(AuthGuard())
   async deleteUserById(
