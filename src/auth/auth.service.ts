@@ -30,6 +30,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if(
+      user.FullName === '' ||
+      user.Adress === '' ||
+      user.PhoneNumber === ''
+    ) {
+      this.logger.log(user);
+    }
+
     const payload: JwtPayload = { userId: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload);
 

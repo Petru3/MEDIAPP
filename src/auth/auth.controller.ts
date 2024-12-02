@@ -23,15 +23,15 @@ export class AuthController {
   }
 
   @Post('/signup')
-  @UseGuards(AuthGuard())
+  // @UseGuards(AuthGuard())
   async signUp(
     @Body(ValidationPipe) signUpCredentials: SignUpCredentials, 
     @GetUser() user: User
   ): Promise<void> {
 
-    if (![UserRole.ADMIN, UserRole.COORDONATOR].includes(user.role)) {
-      throw new NotFoundException('You do not have permission to create accounts');
-    }
+    // if (![UserRole.ADMIN, UserRole.COORDONATOR].includes(user.role)) {
+    //   throw new NotFoundException('You do not have permission to create accounts');
+    // }
     
     return this.authService.signUp(signUpCredentials);
   }
@@ -42,6 +42,7 @@ export class AuthController {
   ): Promise<{ accessToken: string }> {
 
     return this.authService.signIn(signInCredentials);
+
   }
 
   @Get()
@@ -78,7 +79,9 @@ export class AuthController {
     @Body(ValidationPipe) updateCredentials: UpdateCredentials,
     @GetUser() user: User
   ): Promise<User> {
+
     if (user.role !== UserRole.ADMIN && user.role !== UserRole.COORDONATOR) {
+
       if (user.id !== id) {
         throw new NotFoundException(`You can't update others' profiles!`);
       }
@@ -103,6 +106,7 @@ export class AuthController {
     @Param('id') id: string,
     @GetUser() user: User
   ): Promise<void> {
+
     this.checkUserPrivileges(user);
 
     // Coordonator cannot delete Admin accounts
