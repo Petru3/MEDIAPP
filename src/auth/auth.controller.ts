@@ -23,15 +23,15 @@ export class AuthController {
   }
 
   @Post('/signup')
-  // @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard())
   async signUp(
     @Body(ValidationPipe) signUpCredentials: SignUpCredentials, 
     @GetUser() user: User
   ): Promise<void> {
 
-    // if (![UserRole.ADMIN, UserRole.COORDONATOR].includes(user.role)) {
-    //   throw new NotFoundException('You do not have permission to create accounts');
-    // }
+    if (![UserRole.ADMIN, UserRole.COORDONATOR].includes(user.role)) {
+      throw new NotFoundException('You do not have permission to create accounts');
+    }
     
     return this.authService.signUp(signUpCredentials);
   }
